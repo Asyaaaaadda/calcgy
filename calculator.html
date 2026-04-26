@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Kalkulator energi LoRa untuk estimasi umur baterai node ESP32 dan SX1276 berbasis parameter perangkat dan data lapangan.">
+    <title>Kalkulator Energi LoRa | Estimasi Umur Baterai ESP32 SX1276</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@400;600;700;800&family=Outfit:wght@600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<div class="site-shell page-calculator" id="top">
+    <header class="topbar">
+        <div class="brand-wrap">
+            <h1>Kalkulator Energi LoRa</h1>
+            <p class="subtitle">Estimasi umur baterai node ESP32 dan SX1276 untuk skenario monitoring IoT.</p>
+        </div>
+        <nav class="main-nav" aria-label="Navigasi utama">
+            <a href="calculator.html" class="active">Kalkulator</a>
+            <a href="panduan.html">Panduan</a>
+        </nav>
+    </header>
+
+    <main class="layout-grid">
+        <section class="panel panel-form" id="parameter">
+            <div class="panel-head">
+                <h2>Input Parameter</h2>
+                <p>Gunakan parameter sesuai spesifikasi perangkat dan kondisi implementasi agar estimasi lebih akurat.</p>
+            </div>
+
+            <div class="form-grid">
+                <div class="input-group">
+                    <div class="label-line">
+                        <label for="batCapacity">Kapasitas Baterai (mAh)</label>
+                        <span class="help-wrap" aria-hidden="true">
+                            <span class="help-icon">?</span>
+                            <span class="tooltip">Masukkan kapasitas nominal baterai/powerbank. Rentang umum perangkat lapangan: 2000 sampai 20000 mAh. Nilai contoh: 5000 mAh.</span>
+                        </span>
+                    </div>
+                    <input type="number" id="batCapacity" value="5000" oninput="calculate()">
+                </div>
+
+                <div class="input-group">
+                    <div class="label-line">
+                        <label for="batVoltage">Tegangan Baterai (Volt)</label>
+                        <span class="help-wrap" aria-hidden="true">
+                            <span class="help-icon">?</span>
+                            <span class="tooltip">Baterai Lithium umumnya menggunakan tegangan nominal 3.7V. Nilai ini adalah standar sel Li-ion/Li-po.</span>
+                        </span>
+                    </div>
+                    <input type="number" id="batVoltage" value="3.7" step="0.1" oninput="calculate()">
+                    <small>Rekomendasi teknis: 3.7V (sel Lithium).</small>
+                </div>
+
+                <div class="input-group">
+                    <div class="label-line">
+                        <label for="standbyCurrent">Arus Standby (mA)</label>
+                        <span class="help-wrap" aria-hidden="true">
+                            <span class="help-icon">?</span>
+                            <span class="tooltip">Saat tidak transmit LoRa, ESP32 umumnya berada di 40-50 mA. Saat sistem berjalan aktif (sensor, komputasi, I/O), arus sering naik ke 60-90 mA.</span>
+                        </span>
+                    </div>
+                    <input type="number" id="standbyCurrent" value="50" oninput="calculate()">
+                    <small>Referensi lapangan: idle 40-50 mA, aktif 60-90 mA.</small>
+                </div>
+
+                <div class="input-group">
+                    <div class="label-line">
+                        <label for="txCurrent">Arus Transmisi (mA)</label>
+                        <span class="help-wrap" aria-hidden="true">
+                            <span class="help-icon">?</span>
+                            <span class="tooltip">SX1276 pada daya pancar 20 dBm umumnya sekitar 120 mA. Kisaran implementasi umum: 105-130 mA tergantung modul dan efisiensi catu daya.</span>
+                        </span>
+                    </div>
+                    <input type="number" id="txCurrent" value="120" oninput="calculate()">
+                    <small>Referensi 20 dBm: 120 mA (range 105-130 mA).</small>
+                </div>
+
+                <div class="input-group">
+                    <div class="label-line">
+                        <label for="airtime">Airtime LoRa (ms)</label>
+                        <span class="help-wrap" aria-hidden="true">
+                            <span class="help-icon">?</span>
+                            <span class="tooltip">Referensi BW 125 kHz payload pendek: SF7 62 ms, SF8 113 ms, SF9 205 ms, SF10 371 ms, SF11 741 ms, SF12 1319 ms. Nilai aktual berubah sesuai payload dan coding rate.</span>
+                        </span>
+                    </div>
+                    <select id="sfPreset" class="sf-select" aria-label="Pilih spreading factor LoRa">
+                        <option value="62">SF7 - 62 ms</option>
+                        <option value="113">SF8 - 113 ms</option>
+                        <option value="205">SF9 - 205 ms</option>
+                        <option value="371">SF10 - 371 ms</option>
+                        <option value="741">SF11 - 741 ms</option>
+                        <option value="1319">SF12 - 1319 ms</option>
+                        <option value="custom">Custom (manual)</option>
+                    </select>
+                    <input type="number" id="airtime" value="62" oninput="calculate()">
+                    <small>Pilih SF dari dropdown atau gunakan Custom untuk isi airtime manual.</small>
+                </div>
+
+                <div class="input-group">
+                    <div class="label-line">
+                        <label for="interval">Interval Kirim (detik)</label>
+                        <span class="help-wrap" aria-hidden="true">
+                            <span class="help-icon">?</span>
+                            <span class="tooltip">Sesuaikan dengan variabel interval pada firmware. Jika TX_INTERVAL 10, maka perangkat mengirim setiap 10 detik. Interval lebih rapat akan meningkatkan konsumsi energi per jam.</span>
+                        </span>
+                    </div>
+                    <input type="number" id="interval" value="10" oninput="calculate()">
+                </div>
+            </div>
+
+            <div class="section-box field-box">
+                <h3>Input Data Lapangan (OLED)</h3>
+                <div class="input-group no-gap">
+                    <div class="label-line">
+                        <label for="oledTotal">Total Energi Terpakai (Joule)</label>
+                        <span class="help-wrap" aria-hidden="true">
+                            <span class="help-icon">?</span>
+                            <span class="tooltip">Masukkan nilai energi total yang tampil pada OLED perangkat. Nilai ini digunakan untuk estimasi sisa kapasitas baterai aktual.</span>
+                        </span>
+                    </div>
+                    <input type="number" id="oledTotal" value="0" step="0.0001" oninput="calculate()" class="input-emphasis">
+                    <small>Masukkan angka total dari OLED ESP32 (bukan per paket).</small>
+                </div>
+            </div>
+
+            <section class="validation-box" id="validationBox" hidden>
+                <h3>Perlu Penyesuaian Input</h3>
+                <ul id="validationList"></ul>
+            </section>
+
+            <div class="action-row">
+                <button type="button" id="mobileEnter" class="action-btn ghost mobile-enter">Enter</button>
+                <button type="button" id="printSummary" class="action-btn secondary">Cetak Ringkasan</button>
+            </div>
+        </section>
+
+        <aside class="panel panel-result" id="hasil">
+            <button type="button" class="theory-toggle" id="theoryToggle" aria-expanded="true" aria-controls="theoryResultBox">
+                Sembunyikan Hasil Teori
+            </button>
+
+            <div class="section-box result-box" id="theoryResultBox">
+                <h3>Hasil Perhitungan Teori</h3>
+                <div class="result-item">
+                    <span class="result-title">Kapasitas Maksimal Tangki</span>
+                    <span class="result-value"><span id="resBatJoule">0</span> J</span>
+                </div>
+                <div class="result-item">
+                    <span class="result-title">Energi per Transmisi (E_Now)</span>
+                    <span class="result-value"><span id="resTxJoule">0</span> mJ</span>
+                </div>
+                <div class="result-item">
+                    <span class="result-title">Konsumsi Daya per Jam</span>
+                    <span class="result-value"><span id="resTotalHour">0</span> J/Jam</span>
+                </div>
+
+                <div class="highlight-box">
+                    <div class="highlight-label">Maksimal Umur Baterai (100% ke 0%)</div>
+                    <div class="highlight-value"><span id="resMaxDays">0</span> Hari</div>
+                    <div class="highlight-subtext">(Sekitar <span id="resMaxHours">0</span> Jam)</div>
+                </div>
+            </div>
+
+            <div class="section-box status-box">
+                <h3>Status Baterai Saat Ini</h3>
+                <div class="status-row">
+                    <span>Sisa Kapasitas Baterai</span>
+                    <span id="resPercent" class="battery-percent">100%</span>
+                </div>
+                <div class="progress-bar">
+                    <div class="progress-fill" id="batteryBar"></div>
+                </div>
+                <div class="highlight-box">
+                    <div class="highlight-label">Sisa Waktu Sebelum Mati Total</div>
+                    <div class="highlight-value small"><span id="resRemainDays">0</span> Hari</div>
+                    <div class="highlight-subtext">(Sisa <span id="resRemainHours">0</span> Jam)</div>
+                </div>
+            </div>
+
+        </aside>
+    </main>
+
+</div>
+
+<script src="scripts.js"></script>
+
+</body>
+</html>

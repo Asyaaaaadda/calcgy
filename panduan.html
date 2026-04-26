@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Panduan parameter dan asumsi kalkulator energi LoRa untuk ESP32 dan SX1276.">
+    <title>Panduan Parameter LoRa | Kalkulator Energi</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@400;600;700;800&family=Outfit:wght@600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<div class="site-shell">
+    <header class="topbar">
+        <div class="brand-wrap">
+            <h1>Panduan Parameter LoRa</h1>
+            <p class="subtitle">Referensi praktis agar input kalkulator konsisten dan mudah dipertanggungjawabkan.</p>
+        </div>
+        <nav class="main-nav" aria-label="Navigasi utama">
+            <a href="calculator.html">Kalkulator</a>
+            <a href="panduan.html" aria-current="page">Panduan</a>
+        </nav>
+    </header>
+
+    <main class="panel guide-page">
+        <div class="panel-head">
+            <h2>Asumsi Dasar dan Rentang Referensi</h2>
+            <p>Gunakan angka berikut sebagai baseline awal sebelum kalibrasi lapangan.</p>
+        </div>
+
+        <section class="guide-accordion" id="guideAccordion" aria-label="Panduan parameter LoRa">
+            <article class="guide-item">
+                <button class="guide-title" type="button" aria-expanded="false">
+                    <span>Tegangan Baterai (3.7V)</span>
+                    <span class="guide-chevron" aria-hidden="true"></span>
+                </button>
+                <div class="guide-detail">
+                    <p>Parameter ini menjelaskan sumber energi utama perangkat.</p>
+                    <ul>
+                        <li>Baterai Lithium umumnya memiliki tegangan nominal 3.7V.</li>
+                        <li>Nilai ini aman digunakan sebagai baseline perhitungan awal.</li>
+                        <li>Jika memakai konfigurasi lain, sesuaikan sesuai datasheet baterai.</li>
+                    </ul>
+                </div>
+            </article>
+
+            <article class="guide-item">
+                <button class="guide-title" type="button" aria-expanded="false">
+                    <span>Tegangan Kerja ESP32 (3.3V)</span>
+                    <span class="guide-chevron" aria-hidden="true"></span>
+                </button>
+                <div class="guide-detail">
+                    <p>Parameter ini menunjukkan tegangan operasi logika perangkat.</p>
+                    <ul>
+                        <li>ESP32 dan SX1276 bekerja pada domain 3.3V.</li>
+                        <li>Perhitungan energi transmisi dan standby menggunakan nilai ini.</li>
+                        <li>Pastikan regulator dan catu daya stabil agar estimasi mendekati kondisi nyata.</li>
+                    </ul>
+                </div>
+            </article>
+
+            <article class="guide-item">
+                <button class="guide-title" type="button" aria-expanded="false">
+                    <span>Arus Standby</span>
+                    <span class="guide-chevron" aria-hidden="true"></span>
+                </button>
+                <div class="guide-detail">
+                    <p>Arus standby adalah arus saat node aktif tetapi tidak sedang transmit.</p>
+                    <ul>
+                        <li>Rentang idle yang sering dijumpai: 40-50 mA.</li>
+                        <li>Saat proses sensor/aplikasi aktif: sekitar 60-90 mA.</li>
+                        <li>Gunakan nilai rata-rata pengukuran lapangan agar hasil lebih presisi.</li>
+                    </ul>
+                </div>
+            </article>
+
+            <article class="guide-item">
+                <button class="guide-title" type="button" aria-expanded="false">
+                    <span>Arus Transmisi</span>
+                    <span class="guide-chevron" aria-hidden="true"></span>
+                </button>
+                <div class="guide-detail">
+                    <p>Arus transmisi dipakai saat modul LoRa sedang mengirim paket.</p>
+                    <ul>
+                        <li>Pada 20 dBm, SX1276 umumnya sekitar 120 mA.</li>
+                        <li>Variasi implementasi lapangan: sekitar 105-130 mA.</li>
+                        <li>Perbedaan dipengaruhi modul, antena, dan kualitas catu daya.</li>
+                    </ul>
+                </div>
+            </article>
+
+            <article class="guide-item">
+                <button class="guide-title" type="button" aria-expanded="false">
+                    <span>Airtime SF7-SF12 (BW 125 kHz)</span>
+                    <span class="guide-chevron" aria-hidden="true"></span>
+                </button>
+                <div class="guide-detail">
+                    <p>Airtime menentukan durasi radio aktif setiap transmisi.</p>
+                    <ul>
+                        <li>SF7: 62 ms</li>
+                        <li>SF8: 113 ms</li>
+                        <li>SF9: 205 ms</li>
+                        <li>SF10: 371 ms</li>
+                        <li>SF11: 741 ms</li>
+                        <li>SF12: 1319 ms</li>
+                    </ul>
+                    <p>Semakin tinggi SF, jangkauan meningkat tetapi konsumsi energi juga naik.</p>
+                </div>
+            </article>
+
+            <article class="guide-item">
+                <button class="guide-title" type="button" aria-expanded="false">
+                    <span>Interval Kirim</span>
+                    <span class="guide-chevron" aria-hidden="true"></span>
+                </button>
+                <div class="guide-detail">
+                    <p>Interval kirim menentukan seberapa sering perangkat mengirim data.</p>
+                    <ul>
+                        <li>Ikuti nilai TX_INTERVAL pada firmware agar konsisten.</li>
+                        <li>Interval lebih rapat meningkatkan energi per jam.</li>
+                        <li>Interval lebih longgar memperpanjang umur baterai.</li>
+                    </ul>
+                </div>
+            </article>
+        </section>
+    </main>
+
+</div>
+<script src="panduan.js"></script>
+</body>
+</html>

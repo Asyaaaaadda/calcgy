@@ -703,8 +703,8 @@ small {
         position: fixed;
         left: 0.6rem;
         right: 0.6rem;
-        top: auto;
-        bottom: 0.7rem;
+        top: 0.7rem;
+        bottom: auto;
         width: auto;
         max-height: 42vh;
         overflow: auto;

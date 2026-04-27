@@ -1,5 +1,4 @@
 function setupGuideAccordion() {
-    const media = window.matchMedia("(max-width: 760px)");
     const items = Array.from(document.querySelectorAll(".guide-item"));
     const titleButtons = Array.from(document.querySelectorAll(".guide-title"));
 
@@ -22,8 +21,6 @@ function setupGuideAccordion() {
 
     titleButtons.forEach((button) => {
         button.addEventListener("click", () => {
-            if (!media.matches) return;
-
             const item = button.closest(".guide-item");
             if (!item) return;
 
@@ -35,12 +32,6 @@ function setupGuideAccordion() {
 
             openItem(item);
         });
-    });
-
-    media.addEventListener("change", (event) => {
-        if (!event.matches) {
-            closeAll();
-        }
     });
 
     closeAll();

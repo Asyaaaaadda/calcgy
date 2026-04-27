@@ -503,7 +503,7 @@ small {
     align-items: center;
     justify-content: space-between;
     gap: 0.8rem;
-    cursor: default;
+    cursor: pointer;
 }
 
 .guide-chevron {
@@ -544,18 +544,6 @@ small {
 
 .guide-item.is-open .guide-chevron {
     transform: rotate(225deg);
-}
-
-@media (hover: hover) and (pointer: fine) {
-    .guide-item:hover .guide-detail {
-        max-height: 420px;
-        opacity: 1;
-        padding: 0.1rem 0.9rem 0.85rem;
-    }
-
-    .guide-item:hover .guide-chevron {
-        transform: rotate(225deg);
-    }
 }
 
 @media (max-width: 1080px) {
